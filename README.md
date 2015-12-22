@@ -25,5 +25,5 @@ flashvars:
  - framerate     - частота кадров в секунду
  - recordTimeout - продолжительность записи видео до автом.остановки
  - useGuiHelper  - ручное управление интерфейсом через js (иначе flash)
- - autoStopOnly  - без возможности прерывать через кнопку "—топ" до истечени¤ recordTimeout
- - &debug        - debug mode
+ - autoStopOnly  - без возможности прерывать через кнопку "Стоп" до истечени recordTimeout
+ - debug        - debug mode
