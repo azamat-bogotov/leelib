@@ -1,6 +1,7 @@
 1. Download and setup flex sdk (need java runtime)
 
 2. Add library path and source path in /path/to/flexsdk/frameworks/flex-config.xml
+```
     <library-path>
         ...
         <path-element>path/to/src/leelib/util/flvEncoder/alchemy</path-element>
@@ -10,6 +11,7 @@
         ...
         <path-element>/path/to/src</path-element>
     </source-path>
+```
 
 3. run in console:
 ```
