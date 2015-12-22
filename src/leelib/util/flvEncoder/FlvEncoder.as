@@ -359,7 +359,7 @@ package leelib.util.flvEncoder
 			b.writeByte(1); 
 			b.writeByte(int(true));
 
-			var mdc:String = "FlvEncoder v0.9 Lee Felarca";			
+			var mdc:String = "FlvEncoder v0.1 BERTA";			
 			writeUI16(b, "metadatacreator".length);
 			b.writeUTFBytes("metadatacreator");
 			b.writeByte(2); 
