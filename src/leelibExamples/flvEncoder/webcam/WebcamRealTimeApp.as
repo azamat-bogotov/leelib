@@ -12,6 +12,7 @@ package leelibExamples.flvEncoder.webcam
     import leelibExamples.flvEncoder.webcam.uiEtc.States;
     import leelibExamples.flvEncoder.webcam.uiEtc.RecordButton;
     import leelibExamples.flvEncoder.webcam.uiEtc.MessageBox;
+    import leelibExamples.flvEncoder.webcam.uiEtc.SaveDialog;
     import flash.geom.Matrix;
     import flash.geom.Rectangle;
     import leelib.util.flvEncoder.FlvEncoder;
@@ -30,7 +31,6 @@ package leelibExamples.flvEncoder.webcam
     import flash.events.IOErrorEvent;
     import flash.events.ProgressEvent;
     import flash.events.SecurityErrorEvent;
-    import flash.net.FileReference;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
     import flash.net.URLRequestMethod;
@@ -48,6 +48,7 @@ package leelibExamples.flvEncoder.webcam
         private var _autoStopOnly:Boolean     = false; // использовать подсказки о ходе записи и загрузки средствами flash(иначе js)
         private var _useInlineGui:Boolean     = true;  // использовать подсказки о ходе записи и загрузки средствами flash(иначе js)
         private var _debug:Boolean            = false; // использовать подсказки о ходе записи и загрузки средствами flash(иначе js)
+        private var _uploadToServer:Boolean   = false;
 
         private var _params:Object;
         private var _flvEncoder:FlvEncoder;
@@ -57,6 +58,7 @@ package leelibExamples.flvEncoder.webcam
         private var _tfTime:TextField;
         private var _tfSize:TextField;
         private var _waitForUpload: MessageBox;
+        private var _saveDialog: SaveDialog;
 
         private var _cam:Camera;
         private var _video:Video;
@@ -107,6 +109,9 @@ package leelibExamples.flvEncoder.webcam
             }
             if (this._params.hasOwnProperty('debug')) {
                 this._debug = true;
+            }
+            if (this._params.hasOwnProperty('uploadToServer')) {
+                this._uploadToServer = true;
             }
             // ================================
             
@@ -173,6 +178,11 @@ package leelibExamples.flvEncoder.webcam
                     y = OUTPUT_HEIGHT / 2;
                 }
                 this.addChild(this._waitForUpload);
+            }
+            
+            if (!this._uploadToServer) {
+                this._saveDialog = new SaveDialog(">>> Нажмите для сохранения <<<", OUTPUT_WIDTH - 1, OUTPUT_HEIGHT, onSaveDialogClose);
+                this.addChild(this._saveDialog);
             }
 
             this._video = new Video();
@@ -347,7 +357,7 @@ package leelibExamples.flvEncoder.webcam
             this._recordId = setTimeout(this.onRecordInterval, Math.max(_local_4, 10));
         }
 
-        private function onBtnRecClick(_arg_1:*):void
+        private function onBtnRecClick(e:*):void
         {
             if (this._state == States.WAITING_FOR_RECORD) {
                 this.setState(States.RECORDING);
@@ -356,6 +366,11 @@ package leelibExamples.flvEncoder.webcam
                     this.setState(States.SAVING);
                 }
             }
+        }
+        
+        private function onSaveDialogClose(e:*):void
+        {
+            this.setState(States.WAITING_FOR_RECORD);
         }
 
         private function addMessage(msg:String):void
@@ -444,10 +459,14 @@ package leelibExamples.flvEncoder.webcam
             this._flvEncoder.updateDurationMetadata();
             var flvSrc:ByteArrayFlvEncoder = (this._flvEncoder as ByteArrayFlvEncoder);
             var flvData:ByteArray = flvSrc.byteArray;
-            
-            uploadToServer(flvData);
+
+            if (_uploadToServer) {
+                uploadToServer(flvData);
+            } else {
+                this._saveDialog.show(flvData, "contact-" + this._params['clientId'] + ".flv");
+            }
         }
-        
+
         private function onStartUpload():void
         {
             flash.external.ExternalInterface.call('vdOnUploadStart');
